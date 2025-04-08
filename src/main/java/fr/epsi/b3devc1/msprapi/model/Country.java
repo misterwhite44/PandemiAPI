@@ -1,5 +1,6 @@
 package fr.epsi.b3devc1.msprapi.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -11,7 +12,8 @@ public class Country {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    @JsonIgnore // L'ID est ignoré dans Swagger pour les requêtes POST
+    private Long id; // Changement ici (Integer → Long)
 
     private String name;
 

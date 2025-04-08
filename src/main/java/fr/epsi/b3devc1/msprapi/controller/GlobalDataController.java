@@ -27,12 +27,15 @@ public class GlobalDataController {
     }
 
     @PostMapping
-    public GlobalData create(@RequestBody GlobalData data) {
-        return globalDataRepository.save(data);
+    public GlobalData create(@RequestBody GlobalData globalData) {
+        return globalDataRepository.save(globalData);
     }
 
     @DeleteMapping("/{id}")
     public void delete(@PathVariable Integer id) {
-        globalDataRepository.deleteById(id);
+        GlobalData globalData = globalDataRepository.findById(id).orElse(null);
+        if (globalData != null) {
+            globalDataRepository.deleteById(id);
+        }
     }
 }

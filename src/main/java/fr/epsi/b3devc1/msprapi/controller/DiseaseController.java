@@ -33,6 +33,10 @@ public class DiseaseController {
 
     @DeleteMapping("/{id}")
     public void delete(@PathVariable Integer id) {
-        diseaseRepository.deleteById(id);
+        // Avant de supprimer un Disease, vérifier s'il est référencé par d'autres entités
+        Disease disease = diseaseRepository.findById(id).orElse(null);
+        if (disease != null) {
+            diseaseRepository.deleteById(id);
+        }
     }
 }

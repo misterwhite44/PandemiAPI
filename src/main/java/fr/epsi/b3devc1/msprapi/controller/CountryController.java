@@ -1,38 +1,56 @@
 package fr.epsi.b3devc1.msprapi.controller;
 
+import fr.epsi.b3devc1.msprapi.model.Continent;
 import fr.epsi.b3devc1.msprapi.model.Country;
-import fr.epsi.b3devc1.msprapi.repository.CountryRepository;
+import fr.epsi.b3devc1.msprapi.repository.ContinentRepository;
+import fr.epsi.b3devc1.msprapi.service.CountryService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
-@RequestMapping("/api/countries")
+@RequestMapping("/countries")
 public class CountryController {
 
-    private final CountryRepository countryRepository;
+    private final CountryService countryService;
+    private final ContinentRepository continentRepository; // Ajoute l'injection de ContinentRepository
 
-    public CountryController(CountryRepository countryRepository) {
-        this.countryRepository = countryRepository;
+    @Autowired
+    public CountryController(CountryService countryService, ContinentRepository continentRepository) {
+        this.countryService = countryService;
+        this.continentRepository = continentRepository; // Injecte le repository ici
     }
 
     @GetMapping
-    public List<Country> getAll() {
-        return countryRepository.findAll();
+    public List<Country> getAllCountries() {
+        return countryService.getAllCountries();
     }
 
     @GetMapping("/{id}")
-    public Country getById(@PathVariable Integer id) {
-        return countryRepository.findById(id).orElse(null);
+    public ResponseEntity<Country> getCountryById(@PathVariable Long id) {
+        Optional<Country> country = countryService.getCountryById(id);
+        return country.map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     @PostMapping
-    public Country create(@RequestBody Country country) {
-        return countryRepository.save(country);
+    public ResponseEntity<Country> createCountry(@RequestBody Country country) {
+        // Assurez-vous que le continent est enregistré avant de créer le pays
+        if (country.getContinent() != null && country.getContinent().getId() == null) {
+            Continent savedContinent = continentRepository.save(country.getContinent());
+            country.setContinent(savedContinent);
+        }
+
+        Country createdCountry = countryService.createCountry(country);
+        return ResponseEntity.status(201).body(createdCountry);
     }
 
     @DeleteMapping("/{id}")
-    public void delete(@PathVariable Integer id) {
-        countryRepository.deleteById(id);
+    public ResponseEntity<Void> deleteCountry(@PathVariable Long id) {
+        countryService.deleteCountry(id);
+        return ResponseEntity.noContent().build();
     }
 }
