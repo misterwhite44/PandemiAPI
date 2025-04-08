@@ -1,5 +1,6 @@
 package fr.epsi.b3devc1.msprapi.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -13,6 +14,7 @@ public class RegionalData {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @JsonIgnore // Ignore l'ID pour le POST dans Swagger
     private Integer id;
 
     private Date date;
