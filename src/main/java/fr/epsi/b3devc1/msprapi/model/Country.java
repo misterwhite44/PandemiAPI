@@ -12,14 +12,12 @@ public class Country {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @JsonIgnore // L'ID est ignoré dans Swagger pour les requêtes POST
-    private Long id; // Changement ici (Integer → Long)
+    @JsonIgnore
+    private Long id;
 
     private String name;
 
     private String iso2;
-
-    private String iso3;
 
     private Integer code3;
 
