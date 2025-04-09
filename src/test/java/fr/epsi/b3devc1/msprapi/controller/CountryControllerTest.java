@@ -36,10 +36,8 @@ public class CountryControllerTest {
         country = new Country();
         country.setId(1L);  // Change ici pour Long
         country.setName("Country1");
-        country.setIso2("C1");
         country.setCode3(1);
         country.setPopulation(1000000L);
-        country.setWhoRegion("Region1");
     }
 
     @Test

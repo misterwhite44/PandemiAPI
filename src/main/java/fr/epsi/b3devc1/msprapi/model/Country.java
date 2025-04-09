@@ -17,13 +17,9 @@ public class Country {
 
     private String name;
 
-    private String iso2;
-
     private Integer code3;
 
     private Long population;
-
-    private String whoRegion;
 
     @ManyToOne
     @JoinColumn(name = "continent_id")
