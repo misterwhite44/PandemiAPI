@@ -1,5 +1,6 @@
 package fr.epsi.b3devc1.msprapi.controller;
 
+import fr.epsi.b3devc1.msprapi.dto.RegionRequest;
 import fr.epsi.b3devc1.msprapi.model.Country;
 import fr.epsi.b3devc1.msprapi.model.Region;
 import fr.epsi.b3devc1.msprapi.repository.CountryRepository;
@@ -34,22 +35,16 @@ public class RegionController {
     }
 
     @PostMapping
-    public Region create(@RequestBody Region region) {
-        Long countryId = region.getCountry().getId();
+    public Region create(@RequestBody RegionRequest request) {
+        // Récupérer le pays
+        Country country = countryRepository.findById(request.getCountryId())
+                .orElseThrow(() -> new RuntimeException("Country with ID " + request.getCountryId() + " not found"));
 
-        // Vérification si l'ID du pays est valide
-        if (countryId == null || countryId <= 0) {
-            throw new RuntimeException("Invalid country ID");
-        }
-
-        // Vérification de l'existence du pays
-        Country country = countryRepository.findById(countryId)
-                .orElseThrow(() -> new RuntimeException("Country with ID " + countryId + " not found"));
-
-        // Associer le pays à la région
+        // Créer une nouvelle région
+        Region region = new Region();
+        region.setName(request.getName());
         region.setCountry(country);
 
-        // Enregistrer la région dans la base de données
         return regionRepository.save(region);
     }
 

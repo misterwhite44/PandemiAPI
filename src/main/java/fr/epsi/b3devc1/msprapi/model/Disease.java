@@ -12,7 +12,7 @@ public class Disease {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @JsonIgnore // Ignore l'ID pour le POST dans Swagger
+    @JsonIgnore
     private Integer id;
 
     private String name;
