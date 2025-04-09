@@ -37,7 +37,6 @@ public class CountryControllerTest {
         country.setId(1L);  // Change ici pour Long
         country.setName("Country1");
         country.setIso2("C1");
-        country.setIso3("C1C");
         country.setCode3(1);
         country.setPopulation(1000000L);
         country.setWhoRegion("Region1");
@@ -45,7 +44,6 @@ public class CountryControllerTest {
 
     @Test
     public void testGetAllCountries() throws Exception {
-        // Données mockées
         Country country2 = new Country();
         country2.setId(2L);  // Change ici pour Long
         country2.setName("Country2");
