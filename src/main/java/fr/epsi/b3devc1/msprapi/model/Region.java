@@ -12,16 +12,12 @@ public class Region {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @JsonIgnore // Ignore l'ID pour le POST dans Swagger
-    private Long id;  // Identifiant de type Long
+    @JsonIgnore
+    private Long id;
 
     private String name;
 
-    private Double lat;
-
-    private Double longitude;
-
-    @ManyToOne(cascade = CascadeType.REMOVE) // Cascade delete pour supprimer Region lorsque le Country est supprimé
+    @ManyToOne(cascade = CascadeType.REMOVE)
     @JoinColumn(name = "country_id")
-    private Country country;  // Référence à l'entité Country
+    private Country country;
 }
