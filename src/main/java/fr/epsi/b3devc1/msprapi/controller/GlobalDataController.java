@@ -31,6 +31,18 @@ public class GlobalDataController {
         return globalDataRepository.save(globalData);
     }
 
+    @PutMapping("/{id}")
+    public GlobalData update(@PathVariable Integer id, @RequestBody GlobalData globalData) {
+        // Vérifie si le GlobalData existe
+        if (!globalDataRepository.existsById(id)) {
+            return null;  // Retourne null si le GlobalData n'existe pas
+        }
+
+        // Met à jour le GlobalData
+        globalData.setId(id);
+        return globalDataRepository.save(globalData);
+    }
+
     @DeleteMapping("/{id}")
     public void delete(@PathVariable Integer id) {
         GlobalData globalData = globalDataRepository.findById(id).orElse(null);

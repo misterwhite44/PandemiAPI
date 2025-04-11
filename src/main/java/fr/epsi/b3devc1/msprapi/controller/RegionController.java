@@ -48,7 +48,6 @@ public class RegionController {
         return regionRepository.save(region);
     }
 
-
     // Supprimer une région
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {

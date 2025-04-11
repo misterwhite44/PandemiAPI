@@ -46,6 +46,18 @@ public class ContinentController {
         return ResponseEntity.status(201).body(savedContinent);
     }
 
+    @PutMapping
+    public ResponseEntity<Continent> update(@RequestBody Continent continent) {
+        // Vérifie si le continent existe
+        if (!continentRepository.existsById(continent.getId())) {
+            return ResponseEntity.notFound().build();  // Retourne un statut 404 Not Found si le continent n'existe pas
+        }
+
+        // Met à jour le continent
+        Continent updatedContinent = continentRepository.save(continent);
+        return ResponseEntity.ok(updatedContinent);  // Retourne le continent mis à jour avec un statut 200 OK
+    }
+
     // Supprime un continent par son ID (DELETE)
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Integer id) {

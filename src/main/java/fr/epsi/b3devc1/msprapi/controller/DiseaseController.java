@@ -31,6 +31,18 @@ public class DiseaseController {
         return diseaseRepository.save(disease);
     }
 
+    @PutMapping("/{id}")
+    public Disease update(@PathVariable Integer id, @RequestBody Disease disease) {
+        // Vérifie si le Disease existe
+        if (!diseaseRepository.existsById(id)) {
+            return null;  // Retourne null si le Disease n'existe pas
+        }
+
+        // Met à jour le Disease
+        disease.setId(id);
+        return diseaseRepository.save(disease);
+    }
+
     @DeleteMapping("/{id}")
     public void delete(@PathVariable Integer id) {
         // Avant de supprimer un Disease, vérifier s'il est référencé par d'autres entités

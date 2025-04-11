@@ -31,6 +31,18 @@ public class RegionalDataController {
         return regionalDataRepository.save(data);
     }
 
+    @PutMapping("/{id}")
+    public RegionalData update(@PathVariable Integer id, @RequestBody RegionalData data) {
+        // Vérifie si le RegionalData existe
+        if (!regionalDataRepository.existsById(id)) {
+            return null;  // Retourne null si le RegionalData n'existe pas
+        }
+
+        // Met à jour le RegionalData
+        data.setId(id);
+        return regionalDataRepository.save(data);
+    }
+
     @DeleteMapping("/{id}")
     public void delete(@PathVariable Integer id) {
         regionalDataRepository.deleteById(id);

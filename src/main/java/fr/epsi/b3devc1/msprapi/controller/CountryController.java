@@ -48,6 +48,19 @@ public class CountryController {
         return ResponseEntity.status(201).body(createdCountry);
     }
 
+    @PutMapping("/{id}")
+    public ResponseEntity<Country> updateCountry(@PathVariable Long id, @RequestBody Country country) {
+        // Vérifiez si le pays existe
+        if (!countryService.getCountryById(id).isPresent()) {
+            return ResponseEntity.notFound().build();
+        }
+
+        // Mettez à jour le pays
+        country.setId(id);
+        Country updatedCountry = countryService.createCountry(country);
+        return ResponseEntity.ok(updatedCountry);
+    }
+
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteCountry(@PathVariable Long id) {
         countryService.deleteCountry(id);
