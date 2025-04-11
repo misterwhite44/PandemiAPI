@@ -1,100 +1,80 @@
 package fr.epsi.b3devc1.msprapi.controller;
 
 import fr.epsi.b3devc1.msprapi.model.Country;
-import fr.epsi.b3devc1.msprapi.repository.CountryRepository;
+import fr.epsi.b3devc1.msprapi.model.Continent;
+import fr.epsi.b3devc1.msprapi.service.CountryService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.test.web.servlet.MockMvc;
+import org.mockito.MockitoAnnotations;
+import org.springframework.http.ResponseEntity;
 
-import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@WebMvcTest(CountryController.class)
-public class CountryControllerTest {
-
-    @Autowired
-    private MockMvc mockMvc;
+class CountryControllerTest {
 
     @Mock
-    private CountryRepository countryRepository;
+    private CountryService countryService;
 
     @InjectMocks
     private CountryController countryController;
 
     private Country country;
+    private Continent continent;
 
     @BeforeEach
-    public void setUp() {
-        country = new Country();
-        country.setId(1L);  // Change ici pour Long
-        country.setName("Country1");
-        country.setCode3(1);
-        country.setPopulation(1000000L);
+    void setUp() {
+        MockitoAnnotations.openMocks(this);
+        continent = new Continent(1, "Europe");
+        country = new Country(1L, "France", 33, 67000000L, continent); // code3 est un Integer, population est un Long
     }
 
     @Test
-    public void testGetAllCountries() throws Exception {
-        Country country2 = new Country();
-        country2.setId(2L);  // Change ici pour Long
-        country2.setName("Country2");
+    void getAllCountries() {
+        when(countryService.getAllCountries()).thenReturn(List.of(country));
 
-        when(countryRepository.findAll()).thenReturn(Arrays.asList(country, country2));
-
-        // Test GET /api/countries
-        mockMvc.perform(get("/api/countries"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].name").value("Country1"))
-                .andExpect(jsonPath("$[1].name").value("Country2"));
-
-        verify(countryRepository, times(1)).findAll();
+        var countries = countryController.getAllCountries();
+        assertFalse(countries.isEmpty());
+        assertEquals(1, countries.size());
     }
 
     @Test
-    public void testGetCountryById() throws Exception {
-        // Données mockées
-        when(countryRepository.findById(1L)).thenReturn(Optional.of(country));  // Change ici pour Long
+    void getCountryById() {
+        when(countryService.getCountryById(1L)).thenReturn(Optional.of(country));
 
-        // Test GET /api/countries/{id}
-        mockMvc.perform(get("/api/countries/{id}", 1L))  // Change ici pour Long
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.name").value("Country1"))
-                .andExpect(jsonPath("$.iso2").value("C1"));
-
-        verify(countryRepository, times(1)).findById(1L);  // Change ici pour Long
+        ResponseEntity<Country> response = countryController.getCountryById(1L);
+        assertTrue(response.hasBody());
+        assertEquals(200, response.getStatusCodeValue());
+        assertEquals(country.getName(), response.getBody().getName());
     }
 
     @Test
-    public void testCreateCountry() throws Exception {
-        // Données mockées
-        when(countryRepository.save(any(Country.class))).thenReturn(country);
+    void getCountryByIdNotFound() {
+        when(countryService.getCountryById(1L)).thenReturn(Optional.empty());
 
-        // Test POST /api/countries
-        mockMvc.perform(post("/api/countries")
-                        .contentType("application/json")
-                        .content("{\"name\":\"Country1\",\"iso2\":\"C1\",\"iso3\":\"C1C\",\"code3\":1,\"population\":1000000,\"whoRegion\":\"Region1\"}"))
-                .andExpect(status().isCreated())  // Code de statut 201 pour création
-                .andExpect(jsonPath("$.name").value("Country1"));
-
-        verify(countryRepository, times(1)).save(any(Country.class));
+        ResponseEntity<Country> response = countryController.getCountryById(1L);
+        assertEquals(404, response.getStatusCodeValue());
     }
 
     @Test
-    public void testDeleteCountry() throws Exception {
-        // Données mockées
-        doNothing().when(countryRepository).deleteById(1L);  // Change ici pour Long
+    void createCountry() {
+        when(countryService.createCountry(any(Country.class))).thenReturn(country);
 
-        // Test DELETE /api/countries/{id}
-        mockMvc.perform(delete("/api/countries/{id}", 1L))  // Change ici pour Long
-                .andExpect(status().isOk());
+        ResponseEntity<Country> response = countryController.createCountry(country);
+        assertEquals(201, response.getStatusCodeValue());
+        assertEquals(country.getName(), response.getBody().getName());
+    }
 
-        verify(countryRepository, times(1)).deleteById(1L);  // Change ici pour Long
+    @Test
+    void deleteCountry() {
+        doNothing().when(countryService).deleteCountry(1L);
+
+        ResponseEntity<Void> response = countryController.deleteCountry(1L);
+        assertEquals(204, response.getStatusCodeValue());
     }
 }
