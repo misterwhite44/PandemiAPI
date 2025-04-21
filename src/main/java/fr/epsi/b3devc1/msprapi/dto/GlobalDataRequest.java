@@ -1,26 +1,15 @@
-package fr.epsi.b3devc1.msprapi.model;
+package fr.epsi.b3devc1.msprapi.dto;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.persistence.*;
-import lombok.*;
+import lombok.Data;
 
 import java.util.Date;
 
-@Entity
 @Data
-@NoArgsConstructor
-@AllArgsConstructor
-@Schema(description = "Représente les données globales liées à une maladie dans un pays.")
-public class GlobalData {
+@Schema(description = "Requête pour créer ou mettre à jour une donnée globale.")
+public class GlobalDataRequest {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @JsonIgnore
-    @Schema(description = "Identifiant unique des données globales (généré automatiquement).", example = "1")
-    private Integer id;
-
-    @Schema(description = "Date des données.", example = "2023-01-01")
+    @Schema(description = "Date des données.", example = "2023-01-01", required = true)
     private Date date;
 
     @Schema(description = "Nombre total de cas.", example = "1000000")
@@ -53,13 +42,9 @@ public class GlobalData {
     @Schema(description = "Nombre de tests par million d'habitants.", example = "30000")
     private Integer testsPerMillion;
 
-    @ManyToOne(cascade = CascadeType.REMOVE)
-    @JoinColumn(name = "country_id")
-    @Schema(description = "Pays auquel les données globales sont associées.")
-    private Country country;
+    @Schema(description = "ID du pays associé.", example = "1", required = true)
+    private Long countryId;
 
-    @ManyToOne(cascade = CascadeType.REMOVE)
-    @JoinColumn(name = "disease_id")
-    @Schema(description = "Maladie à laquelle les données globales sont associées.")
-    private Disease disease;
+    @Schema(description = "ID de la maladie associée.", example = "1", required = true)
+    private Integer diseaseId;
 }

@@ -1,6 +1,7 @@
 package fr.epsi.b3devc1.msprapi.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -8,13 +9,15 @@ import lombok.*;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@Schema(description = "Représente un continent.")
 public class Continent {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @JsonIgnore // Cette annotation permet de ne pas afficher l'ID dans Swagger pour la création
+    @JsonIgnore
+    @Schema(description = "Identifiant unique du continent (généré automatiquement).", example = "1")
     private Integer id;
 
-    @Column(nullable = false)
+    @Schema(description = "Nom du continent.", example = "Europe", required = true)
     private String name;
 }

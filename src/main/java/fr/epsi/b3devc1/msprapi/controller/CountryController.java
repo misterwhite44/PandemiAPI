@@ -1,10 +1,19 @@
 package fr.epsi.b3devc1.msprapi.controller;
 
+import fr.epsi.b3devc1.msprapi.dto.CountryRequest;
 import fr.epsi.b3devc1.msprapi.model.Continent;
 import fr.epsi.b3devc1.msprapi.model.Country;
 import fr.epsi.b3devc1.msprapi.repository.ContinentRepository;
+import fr.epsi.b3devc1.msprapi.repository.CountryRepository;
 import fr.epsi.b3devc1.msprapi.service.CountryService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -13,57 +22,111 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/countries")
+@Tag(name = "Pays", description = "Gestion des pays")
 public class CountryController {
 
-    private final CountryService countryService;
-    private final ContinentRepository continentRepository; // Ajoute l'injection de ContinentRepository
+    private final CountryRepository countryRepository;
+    private final ContinentRepository continentRepository;
 
     @Autowired
-    public CountryController(CountryService countryService, ContinentRepository continentRepository) {
-        this.countryService = countryService;
-        this.continentRepository = continentRepository; // Injecte le repository ici
+    public CountryController(CountryRepository countryRepository, ContinentRepository continentRepository) {
+        this.countryRepository = countryRepository;
+        this.continentRepository = continentRepository;
     }
 
     @GetMapping
-    public List<Country> getAllCountries() {
-        return countryService.getAllCountries();
+    @Operation(summary = "Récupérer tous les pays avec pagination et filtrage", description = "Permet de récupérer la liste des pays avec des options de pagination et de filtrage.")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Liste des pays récupérée avec succès")
+    })
+    public List<Country> getAllCountries(
+            @Parameter(description = "Numéro de la page (commence à 0)", example = "0")
+            @RequestParam(defaultValue = "0") int page,
+            @Parameter(description = "Taille de la page", example = "10")
+            @RequestParam(defaultValue = "10") int size,
+            @Parameter(description = "Filtrer par nom de pays")
+            @RequestParam(required = false) String name) {
+
+        Pageable pageable = PageRequest.of(page, size);
+        if (name != null && !name.isEmpty()) {
+            return countryRepository.findByNameContaining(name, pageable).getContent();
+        }
+        return countryRepository.findAll(pageable).getContent();
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Country> getCountryById(@PathVariable Long id) {
-        Optional<Country> country = countryService.getCountryById(id);
-        return country.map(ResponseEntity::ok)
-                .orElseGet(() -> ResponseEntity.notFound().build());
+    @Operation(summary = "Récupérer un pays par ID", description = "Permet de récupérer un pays spécifique en fonction de son ID.")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Pays trouvé"),
+        @ApiResponse(responseCode = "404", description = "Pays non trouvé")
+    })
+    public ResponseEntity<Country> getCountryById(
+            @Parameter(description = "ID du pays à récupérer", required = true) @PathVariable Long id) {
+        Optional<Country> country = countryRepository.findById(id);
+        return country.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     @PostMapping
-    public ResponseEntity<Country> createCountry(@RequestBody Country country) {
-        // Assurez-vous que le continent est enregistré avant de créer le pays
-        if (country.getContinent() != null && country.getContinent().getId() == null) {
-            Continent savedContinent = continentRepository.save(country.getContinent());
-            country.setContinent(savedContinent);
-        }
+    @Operation(summary = "Créer un nouveau pays", description = "Permet de créer un nouveau pays.")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "201", description = "Pays créé avec succès"),
+        @ApiResponse(responseCode = "400", description = "Erreur lors de la création du pays")
+    })
+    public ResponseEntity<Country> createCountry(
+            @Parameter(description = "Détails du pays à créer", required = true) @RequestBody CountryRequest request) {
+        Continent continent = continentRepository.findById(request.getContinentId())
+                .orElseThrow(() -> new RuntimeException("Continent with ID " + request.getContinentId() + " not found"));
 
-        Country createdCountry = countryService.createCountry(country);
+        Country country = new Country();
+        country.setName(request.getName());
+        country.setCode3(request.getCode3());
+        country.setPopulation(request.getPopulation());
+        country.setContinent(continent);
+
+        Country createdCountry = countryRepository.save(country);
         return ResponseEntity.status(201).body(createdCountry);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Country> updateCountry(@PathVariable Long id, @RequestBody Country country) {
-        // Vérifiez si le pays existe
-        if (!countryService.getCountryById(id).isPresent()) {
+    @Operation(summary = "Mettre à jour un pays", description = "Permet de mettre à jour les informations d'un pays existant.")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Pays mis à jour avec succès"),
+        @ApiResponse(responseCode = "404", description = "Pays non trouvé")
+    })
+    public ResponseEntity<Country> updateCountry(
+            @Parameter(description = "ID du pays à mettre à jour", required = true) @PathVariable Long id,
+            @Parameter(description = "Détails du pays à mettre à jour", required = true) @RequestBody CountryRequest request) {
+        Optional<Country> existingCountry = countryRepository.findById(id);
+        if (existingCountry.isEmpty()) {
             return ResponseEntity.notFound().build();
         }
 
-        // Mettez à jour le pays
-        country.setId(id);
-        Country updatedCountry = countryService.createCountry(country);
+        Continent continent = continentRepository.findById(request.getContinentId())
+                .orElseThrow(() -> new RuntimeException("Continent with ID " + request.getContinentId() + " not found"));
+
+        Country country = existingCountry.get();
+        country.setName(request.getName());
+        country.setCode3(request.getCode3());
+        country.setPopulation(request.getPopulation());
+        country.setContinent(continent);
+
+        Country updatedCountry = countryRepository.save(country);
         return ResponseEntity.ok(updatedCountry);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteCountry(@PathVariable Long id) {
-        countryService.deleteCountry(id);
-        return ResponseEntity.noContent().build();
+    @Operation(summary = "Supprimer un pays", description = "Permet de supprimer un pays en fonction de son ID.")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "204", description = "Pays supprimé avec succès"),
+        @ApiResponse(responseCode = "404", description = "Pays non trouvé")
+    })
+    public ResponseEntity<Void> deleteCountry(
+            @Parameter(description = "ID du pays à supprimer", required = true) @PathVariable Long id) {
+
+        if (countryRepository.existsById(id)) {
+            countryRepository.deleteById(id);
+            return ResponseEntity.noContent().build();
+        }
+        return ResponseEntity.notFound().build();
     }
 }
