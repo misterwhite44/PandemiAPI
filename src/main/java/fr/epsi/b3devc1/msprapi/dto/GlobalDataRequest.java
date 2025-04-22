@@ -45,6 +45,9 @@ public class GlobalDataRequest {
     @Schema(description = "ID du pays associé.", example = "1", required = true)
     private Long countryId;
 
+    @Schema(description = "ID de la region associée.", example = "1", required = true)
+    private Long regionId;
+
     @Schema(description = "ID de la maladie associée.", example = "1", required = true)
     private Integer diseaseId;
 }

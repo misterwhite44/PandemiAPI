@@ -4,9 +4,11 @@ import fr.epsi.b3devc1.msprapi.dto.GlobalDataRequest;
 import fr.epsi.b3devc1.msprapi.model.Country;
 import fr.epsi.b3devc1.msprapi.model.Disease;
 import fr.epsi.b3devc1.msprapi.model.GlobalData;
+import fr.epsi.b3devc1.msprapi.model.Region;
 import fr.epsi.b3devc1.msprapi.repository.CountryRepository;
 import fr.epsi.b3devc1.msprapi.repository.DiseaseRepository;
 import fr.epsi.b3devc1.msprapi.repository.GlobalDataRepository;
+import fr.epsi.b3devc1.msprapi.repository.RegionRepository;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -28,11 +30,13 @@ public class GlobalDataController {
 
     private final GlobalDataRepository globalDataRepository;
     private final CountryRepository countryRepository;
+    private final RegionRepository regionRepository;
     private final DiseaseRepository diseaseRepository;
 
-    public GlobalDataController(GlobalDataRepository globalDataRepository, CountryRepository countryRepository, DiseaseRepository diseaseRepository) {
+    public GlobalDataController(GlobalDataRepository globalDataRepository, CountryRepository countryRepository, RegionRepository regionRepository, DiseaseRepository diseaseRepository) {
         this.globalDataRepository = globalDataRepository;
         this.countryRepository = countryRepository;
+        this.regionRepository = regionRepository;
         this.diseaseRepository = diseaseRepository;
     }
 
@@ -50,6 +54,8 @@ public class GlobalDataController {
             @RequestParam(required = false) Date date,
             @Parameter(description = "Filtrer par ID de pays")
             @RequestParam(required = false) Long countryId,
+            @Parameter(description = "Filtrer par ID de région")
+            @RequestParam(required = false) Long regionId,
             @Parameter(description = "Filtrer par ID de maladie")
             @RequestParam(required = false) Integer diseaseId) {
 
@@ -59,6 +65,8 @@ public class GlobalDataController {
             return globalDataRepository.findByDate(date, pageable).getContent();
         } else if (countryId != null) {
             return globalDataRepository.findByCountryId(countryId, pageable).getContent();
+        } else if (regionId != null) {
+            return globalDataRepository.findByRegionId(regionId, pageable).getContent();
         } else if (diseaseId != null) {
             return globalDataRepository.findByDiseaseId(diseaseId, pageable).getContent();
         }
@@ -93,6 +101,9 @@ public class GlobalDataController {
         Disease disease = diseaseRepository.findById(request.getDiseaseId())
                 .orElseThrow(() -> new RuntimeException("Disease with ID " + request.getDiseaseId() + " not found"));
 
+        Region region = regionRepository.findById(request.getRegionId())
+                .orElseThrow(() -> new RuntimeException("Region with ID " + request.getRegionId() + " not found"));
+
         GlobalData globalData = new GlobalData();
         globalData.setDate(request.getDate());
         globalData.setTotalCases(request.getTotalCases());
@@ -106,6 +117,7 @@ public class GlobalDataController {
         globalData.setTotalTests(request.getTotalTests());
         globalData.setTestsPerMillion(request.getTestsPerMillion());
         globalData.setCountry(country);
+        globalData.setRegion(region);
         globalData.setDisease(disease);
 
         GlobalData createdGlobalData = globalDataRepository.save(globalData);
@@ -133,6 +145,9 @@ public class GlobalDataController {
         Disease disease = diseaseRepository.findById(request.getDiseaseId())
                 .orElseThrow(() -> new RuntimeException("Disease with ID " + request.getDiseaseId() + " not found"));
 
+        Region region = regionRepository.findById(request.getRegionId())
+                .orElseThrow(() -> new RuntimeException("Region with ID " + request.getRegionId() + " not found"));
+
         GlobalData globalData = existingGlobalData.get();
         globalData.setDate(request.getDate());
         globalData.setTotalCases(request.getTotalCases());
@@ -146,6 +161,7 @@ public class GlobalDataController {
         globalData.setTotalTests(request.getTotalTests());
         globalData.setTestsPerMillion(request.getTestsPerMillion());
         globalData.setCountry(country);
+        globalData.setRegion(region);
         globalData.setDisease(disease);
 
         GlobalData updatedGlobalData = globalDataRepository.save(globalData);

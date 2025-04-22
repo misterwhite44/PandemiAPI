@@ -10,5 +10,6 @@ import java.util.Date;
 public interface GlobalDataRepository extends JpaRepository<GlobalData, Integer> {
     Page<GlobalData> findByDate(Date date, Pageable pageable);
     Page<GlobalData> findByCountryId(Long countryId, Pageable pageable);
+    Page<GlobalData> findByRegionId(Long regionId, Pageable pageable);
     Page<GlobalData> findByDiseaseId(Integer diseaseId, Pageable pageable);
 }

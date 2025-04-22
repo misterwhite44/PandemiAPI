@@ -21,6 +21,9 @@ public class Region {
     @Schema(description = "Nom de la région.", example = "Île-de-France")
     private String name;
 
+    @Schema(description = "Population totale de la region", example = "67000")
+    private Long population;
+
     @ManyToOne(cascade = CascadeType.REMOVE)
     @JoinColumn(name = "country_id")
     @Schema(description = "Pays auquel appartient la région.")

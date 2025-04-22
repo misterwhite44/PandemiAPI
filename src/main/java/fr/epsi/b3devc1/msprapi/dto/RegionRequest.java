@@ -5,5 +5,6 @@ import lombok.Data;
 @Data
 public class RegionRequest {
     private String name;
+    private Long population;
     private Long countryId;
 }

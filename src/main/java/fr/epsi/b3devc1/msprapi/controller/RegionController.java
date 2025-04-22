@@ -76,6 +76,7 @@ public class RegionController {
 
         Region region = new Region();
         region.setName(request.getName());
+        region.setPopulation(request.getPopulation());
         region.setCountry(country);
 
         Region createdRegion = regionRepository.save(region);
@@ -99,6 +100,7 @@ public class RegionController {
 
         Region region = existingRegion.get();
         region.setName(request.getName());
+        region.setPopulation(request.getPopulation());
 
         if (request.getCountryId() != null) {
             Country country = countryRepository.findById(request.getCountryId())
