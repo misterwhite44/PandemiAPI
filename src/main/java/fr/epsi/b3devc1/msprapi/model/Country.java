@@ -22,7 +22,7 @@ public class Country {
     private String name;
 
     @Schema(description = "Code à 3 lettres du pays.", example = "FRA")
-    private Integer code3;
+    private String code3;
 
     @Schema(description = "Population totale du pays.", example = "67000000")
     private Long population;

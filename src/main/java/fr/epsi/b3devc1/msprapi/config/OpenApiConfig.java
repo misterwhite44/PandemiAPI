@@ -14,5 +14,14 @@ public class OpenApiConfig {
                 .pathsToMatch("/**")
                 .build();
     }
+
+    @Bean
+    public io.swagger.v3.oas.models.OpenAPI customOpenAPI() {
+        return new io.swagger.v3.oas.models.OpenAPI()
+                .info(new io.swagger.v3.oas.models.info.Info()
+                        .title("Pandemia API")
+                        .version("1.0.0")
+                        .description("API pour la gestion des données de pandémies"));
+    }
 }
 
