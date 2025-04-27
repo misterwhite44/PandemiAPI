@@ -16,6 +16,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -50,25 +51,25 @@ public class GlobalDataController {
             @RequestParam(defaultValue = "0") int page,
             @Parameter(description = "Taille de la page", example = "10")
             @RequestParam(defaultValue = "10") int size,
-            @Parameter(description = "Filtrer par date")
-            @RequestParam(required = false) Date date,
-            @Parameter(description = "Filtrer par ID de pays")
-            @RequestParam(required = false) Long countryId,
-            @Parameter(description = "Filtrer par ID de région")
-            @RequestParam(required = false) Long regionId,
-            @Parameter(description = "Filtrer par ID de maladie")
-            @RequestParam(required = false) Integer diseaseId) {
+            @Parameter(description = "Filtrer par date (format : dd-MM-yyyy)")
+            @RequestParam(required = false) @DateTimeFormat(pattern = "dd-MM-yyyy") Date date,
+            @Parameter(description = "Filtrer par nom de pays")
+            @RequestParam(required = false) String countryName,
+            @Parameter(description = "Filtrer par nom de région")
+            @RequestParam(required = false) String regionName,
+            @Parameter(description = "Filtrer par nom de maladie")
+            @RequestParam(required = false) String diseaseName) {
 
         Pageable pageable = PageRequest.of(page, size);
 
         if (date != null) {
             return globalDataRepository.findByDate(date, pageable).getContent();
-        } else if (countryId != null) {
-            return globalDataRepository.findByCountryId(countryId, pageable).getContent();
-        } else if (regionId != null) {
-            return globalDataRepository.findByRegionId(regionId, pageable).getContent();
-        } else if (diseaseId != null) {
-            return globalDataRepository.findByDiseaseId(diseaseId, pageable).getContent();
+        } else if (countryName != null && !countryName.isEmpty()) {
+            return globalDataRepository.findByCountryNameContaining(countryName, pageable).getContent();
+        } else if (regionName != null && !regionName.isEmpty()) {
+            return globalDataRepository.findByRegionNameContaining(regionName, pageable).getContent();
+        } else if (diseaseName != null && !diseaseName.isEmpty()) {
+            return globalDataRepository.findByDiseaseNameContaining(diseaseName, pageable).getContent();
         }
 
         return globalDataRepository.findAll(pageable).getContent();

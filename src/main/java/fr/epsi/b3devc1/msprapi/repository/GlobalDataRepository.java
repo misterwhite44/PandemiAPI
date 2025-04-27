@@ -9,7 +9,7 @@ import java.util.Date;
 
 public interface GlobalDataRepository extends JpaRepository<GlobalData, Integer> {
     Page<GlobalData> findByDate(Date date, Pageable pageable);
-    Page<GlobalData> findByCountryId(Long countryId, Pageable pageable);
-    Page<GlobalData> findByRegionId(Long regionId, Pageable pageable);
-    Page<GlobalData> findByDiseaseId(Integer diseaseId, Pageable pageable);
+    Page<GlobalData> findByCountryNameContaining(String countryName, Pageable pageable);
+    Page<GlobalData> findByRegionNameContaining(String regionName, Pageable pageable);
+    Page<GlobalData> findByDiseaseNameContaining(String diseaseName, Pageable pageable);
 }
