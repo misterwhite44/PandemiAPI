@@ -58,10 +58,7 @@ public class GlobalData {
     @Schema(description = "Pays auquel les données globales sont associées.")
     private Country country;
 
-    @ManyToOne(cascade = CascadeType.REMOVE)
-    @JoinColumn(name = "region_id")
-    @Schema(description = "Région à laquelle les données globales sont associées.")
-    private Region region;
+
 
     @ManyToOne(cascade = CascadeType.REMOVE)
     @JoinColumn(name = "disease_id")

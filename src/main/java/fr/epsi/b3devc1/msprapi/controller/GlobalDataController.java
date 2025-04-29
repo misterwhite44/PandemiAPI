@@ -55,8 +55,6 @@ public class GlobalDataController {
             @RequestParam(required = false) @DateTimeFormat(pattern = "dd-MM-yyyy") Date date,
             @Parameter(description = "Filtrer par nom de pays")
             @RequestParam(required = false) String countryName,
-            @Parameter(description = "Filtrer par nom de région")
-            @RequestParam(required = false) String regionName,
             @Parameter(description = "Filtrer par nom de maladie")
             @RequestParam(required = false) String diseaseName) {
 
@@ -66,8 +64,7 @@ public class GlobalDataController {
             return globalDataRepository.findByDate(date, pageable).getContent();
         } else if (countryName != null && !countryName.isEmpty()) {
             return globalDataRepository.findByCountryNameContaining(countryName, pageable).getContent();
-        } else if (regionName != null && !regionName.isEmpty()) {
-            return globalDataRepository.findByRegionNameContaining(regionName, pageable).getContent();
+
         } else if (diseaseName != null && !diseaseName.isEmpty()) {
             return globalDataRepository.findByDiseaseNameContaining(diseaseName, pageable).getContent();
         }
@@ -102,8 +99,7 @@ public class GlobalDataController {
         Disease disease = diseaseRepository.findById(request.getDiseaseId())
                 .orElseThrow(() -> new RuntimeException("Disease with ID " + request.getDiseaseId() + " not found"));
 
-        Region region = regionRepository.findById(request.getRegionId())
-                .orElseThrow(() -> new RuntimeException("Region with ID " + request.getRegionId() + " not found"));
+
 
         GlobalData globalData = new GlobalData();
         globalData.setDate(request.getDate());
@@ -118,7 +114,6 @@ public class GlobalDataController {
         globalData.setTotalTests(request.getTotalTests());
         globalData.setTestsPerMillion(request.getTestsPerMillion());
         globalData.setCountry(country);
-        globalData.setRegion(region);
         globalData.setDisease(disease);
 
         GlobalData createdGlobalData = globalDataRepository.save(globalData);
@@ -146,8 +141,7 @@ public class GlobalDataController {
         Disease disease = diseaseRepository.findById(request.getDiseaseId())
                 .orElseThrow(() -> new RuntimeException("Disease with ID " + request.getDiseaseId() + " not found"));
 
-        Region region = regionRepository.findById(request.getRegionId())
-                .orElseThrow(() -> new RuntimeException("Region with ID " + request.getRegionId() + " not found"));
+
 
         GlobalData globalData = existingGlobalData.get();
         globalData.setDate(request.getDate());
@@ -162,7 +156,6 @@ public class GlobalDataController {
         globalData.setTotalTests(request.getTotalTests());
         globalData.setTestsPerMillion(request.getTestsPerMillion());
         globalData.setCountry(country);
-        globalData.setRegion(region);
         globalData.setDisease(disease);
 
         GlobalData updatedGlobalData = globalDataRepository.save(globalData);

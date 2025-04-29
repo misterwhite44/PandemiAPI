@@ -33,7 +33,5 @@ public class GlobalDataRequest {
 
     private Long countryId;
 
-    private Long regionId;
-
     private Integer diseaseId;
 }
