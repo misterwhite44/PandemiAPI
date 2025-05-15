@@ -17,6 +17,7 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/diseases")
+@CrossOrigin(origins = "*")
 @Tag(name = "Maladies", description = "Gestion des maladies")
 public class DiseaseController {
 

@@ -20,6 +20,7 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/regions")
+@CrossOrigin(origins = "*")
 @Tag(name = "Régions", description = "Gestion des régions")
 public class RegionController {
 

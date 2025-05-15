@@ -19,6 +19,7 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/continents")
+@CrossOrigin(origins = "*")
 @Tag(name = "Continents", description = "Gestion des continents")
 public class ContinentController {
 

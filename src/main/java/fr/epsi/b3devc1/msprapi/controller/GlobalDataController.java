@@ -26,6 +26,7 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/globaldata")
+@CrossOrigin(origins = "*")
 @Tag(name = "Données Globales", description = "Gestion des données globales")
 public class GlobalDataController {
 

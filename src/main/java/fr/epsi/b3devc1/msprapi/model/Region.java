@@ -28,4 +28,5 @@ public class Region {
     @JoinColumn(name = "country_id")
     @Schema(description = "Pays auquel appartient la région.")
     private Country country;
+    
 }

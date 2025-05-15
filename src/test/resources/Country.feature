@@ -17,3 +17,4 @@ Feature: Gestion des pays
     Given un pays "France" existe avec l'ID 1
     When je supprime le pays avec l'ID 1
     Then le pays avec l'ID 1 ne doit plus exister
+
