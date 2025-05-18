@@ -43,10 +43,11 @@ public class GlobalDataController {
     }
 
     @GetMapping
-    @Operation(summary = "Récupérer toutes les données globales avec pagination et filtres", description = "Permet de récupérer la liste des données globales avec des options de pagination et de filtrage.")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Liste des données globales récupérée avec succès")
-    })
+public List<GlobalData> getAll() {
+    Pageable pageable = PageRequest.of(0, 200);
+    return globalDataRepository.findAll(pageable).getContent();
+}
+
     public List<GlobalData> getAll(
             @Parameter(description = "Numéro de la page (commence à 0)", example = "0")
             @RequestParam(defaultValue = "0") int page,

@@ -53,12 +53,14 @@ public class GlobalData {
     @Schema(description = "Nombre de tests par million d'habitants.", example = "30000")
     private Integer testsPerMillion;
 
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.REMOVE)
     @JoinColumn(name = "country_id")
     @Schema(description = "Pays auquel les données globales sont associées.")
     private Country country;
 
-    @ManyToOne
+
+
+    @ManyToOne(cascade = CascadeType.REMOVE)
     @JoinColumn(name = "disease_id")
     @Schema(description = "Maladie à laquelle les données globales sont associées.")
     private Disease disease;
