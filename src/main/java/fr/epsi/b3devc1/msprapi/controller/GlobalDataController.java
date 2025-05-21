@@ -4,7 +4,6 @@ import fr.epsi.b3devc1.msprapi.dto.GlobalDataRequest;
 import fr.epsi.b3devc1.msprapi.model.Country;
 import fr.epsi.b3devc1.msprapi.model.Disease;
 import fr.epsi.b3devc1.msprapi.model.GlobalData;
-import fr.epsi.b3devc1.msprapi.model.Region;
 import fr.epsi.b3devc1.msprapi.repository.CountryRepository;
 import fr.epsi.b3devc1.msprapi.repository.DiseaseRepository;
 import fr.epsi.b3devc1.msprapi.repository.GlobalDataRepository;
@@ -43,15 +42,11 @@ public class GlobalDataController {
     }
 
     @GetMapping
-    @Operation(summary = "Récupérer toutes les données globales avec pagination et filtres", description = "Permet de récupérer la liste des données globales avec des options de pagination et de filtrage.")
+    @Operation(summary = "Récupérer les 200 premières données globales avec filtres optionnels", description = "Permet de récupérer jusqu'à 200 données globales avec des options de filtrage.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Liste des données globales récupérée avec succès")
     })
     public List<GlobalData> getAll(
-            @Parameter(description = "Numéro de la page (commence à 0)", example = "0")
-            @RequestParam(defaultValue = "0") int page,
-            @Parameter(description = "Taille de la page", example = "10")
-            @RequestParam(defaultValue = "10") int size,
             @Parameter(description = "Filtrer par date (format : dd-MM-yyyy)")
             @RequestParam(required = false) @DateTimeFormat(pattern = "dd-MM-yyyy") Date date,
             @Parameter(description = "Filtrer par nom de pays")
@@ -59,13 +54,12 @@ public class GlobalDataController {
             @Parameter(description = "Filtrer par nom de maladie")
             @RequestParam(required = false) String diseaseName) {
 
-        Pageable pageable = PageRequest.of(page, size);
+        Pageable pageable = PageRequest.of(0, 200);
 
         if (date != null) {
             return globalDataRepository.findByDate(date, pageable).getContent();
         } else if (countryName != null && !countryName.isEmpty()) {
             return globalDataRepository.findByCountryNameContaining(countryName, pageable).getContent();
-
         } else if (diseaseName != null && !diseaseName.isEmpty()) {
             return globalDataRepository.findByDiseaseNameContaining(diseaseName, pageable).getContent();
         }
@@ -79,8 +73,7 @@ public class GlobalDataController {
             @ApiResponse(responseCode = "200", description = "Donnée globale trouvée"),
             @ApiResponse(responseCode = "404", description = "Donnée globale non trouvée")
     })
-    public ResponseEntity<GlobalData> getById(
-            @Parameter(description = "ID de la donnée globale à récupérer", required = true) @PathVariable Integer id) {
+    public ResponseEntity<GlobalData> getById(@PathVariable Integer id) {
         Optional<GlobalData> globalData = globalDataRepository.findById(id);
         return globalData.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
@@ -91,16 +84,11 @@ public class GlobalDataController {
             @ApiResponse(responseCode = "201", description = "Donnée globale créée avec succès"),
             @ApiResponse(responseCode = "400", description = "Erreur lors de la création de la donnée globale")
     })
-    public ResponseEntity<GlobalData> create(
-            @Parameter(description = "Détails de la donnée globale à créer", required = true) @RequestBody GlobalDataRequest request) {
-
+    public ResponseEntity<GlobalData> create(@RequestBody GlobalDataRequest request) {
         Country country = countryRepository.findById(request.getCountryId())
                 .orElseThrow(() -> new RuntimeException("Country with ID " + request.getCountryId() + " not found"));
-
         Disease disease = diseaseRepository.findById(request.getDiseaseId())
                 .orElseThrow(() -> new RuntimeException("Disease with ID " + request.getDiseaseId() + " not found"));
-
-
 
         GlobalData globalData = new GlobalData();
         globalData.setDate(request.getDate());
@@ -127,10 +115,7 @@ public class GlobalDataController {
             @ApiResponse(responseCode = "200", description = "Donnée globale mise à jour avec succès"),
             @ApiResponse(responseCode = "404", description = "Donnée globale non trouvée")
     })
-    public ResponseEntity<GlobalData> update(
-            @Parameter(description = "ID de la donnée globale à mettre à jour", required = true) @PathVariable Integer id,
-            @Parameter(description = "Détails de la donnée globale à mettre à jour", required = true) @RequestBody GlobalDataRequest request) {
-
+    public ResponseEntity<GlobalData> update(@PathVariable Integer id, @RequestBody GlobalDataRequest request) {
         Optional<GlobalData> existingGlobalData = globalDataRepository.findById(id);
         if (existingGlobalData.isEmpty()) {
             return ResponseEntity.notFound().build();
@@ -138,11 +123,8 @@ public class GlobalDataController {
 
         Country country = countryRepository.findById(request.getCountryId())
                 .orElseThrow(() -> new RuntimeException("Country with ID " + request.getCountryId() + " not found"));
-
         Disease disease = diseaseRepository.findById(request.getDiseaseId())
                 .orElseThrow(() -> new RuntimeException("Disease with ID " + request.getDiseaseId() + " not found"));
-
-
 
         GlobalData globalData = existingGlobalData.get();
         globalData.setDate(request.getDate());
@@ -169,12 +151,10 @@ public class GlobalDataController {
             @ApiResponse(responseCode = "204", description = "Donnée globale supprimée avec succès"),
             @ApiResponse(responseCode = "404", description = "Donnée globale non trouvée")
     })
-    public ResponseEntity<Void> delete(
-            @Parameter(description = "ID de la donnée globale à supprimer", required = true) @PathVariable Integer id) {
+    public ResponseEntity<Void> delete(@PathVariable Integer id) {
         if (!globalDataRepository.existsById(id)) {
             return ResponseEntity.notFound().build();
         }
-
         globalDataRepository.deleteById(id);
         return ResponseEntity.noContent().build();
     }
