@@ -5,6 +5,7 @@ import fr.epsi.b3devc1.msprapi.dto.RegionRequest;
 import fr.epsi.b3devc1.msprapi.model.Country;
 import fr.epsi.b3devc1.msprapi.model.Region;
 import fr.epsi.b3devc1.msprapi.repository.CountryRepository;
+import fr.epsi.b3devc1.msprapi.repository.GlobalDataRepository;
 import fr.epsi.b3devc1.msprapi.repository.RegionRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -25,6 +26,9 @@ public class RegionControllerTest {
     private MockMvc mockMvc;
 
     @Autowired
+    private GlobalDataRepository globalDataRepository;
+
+    @Autowired
     private RegionRepository regionRepository;
 
     @Autowired
@@ -35,6 +39,7 @@ public class RegionControllerTest {
 
     @BeforeEach
     public void setup() {
+        globalDataRepository.deleteAll();
         regionRepository.deleteAll();
         countryRepository.deleteAll();
     }
