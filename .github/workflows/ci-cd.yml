@@ -35,3 +35,10 @@ jobs:
 
     - name: Run tests
       run: mvn test
+
+    - name: Install JMeter
+      run: sudo apt-get install -y jmeter
+
+    - name: Run JMeter test
+      run: |
+        jmeter -n -t tests/performance/jmeter.jmx -l results.jtl
